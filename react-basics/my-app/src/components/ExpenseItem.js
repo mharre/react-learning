@@ -1,12 +1,14 @@
 // this is normal react syntax
 // return html elements that we want to add
-function ExpenseItem() {
+import './ExpenseItem.css';
+
+function ExpenseItem(props) {
     return (
-        <div>
-            <div>March 30th 2021</div>
-            <div>
-                <h2>Car Insurance</h2>
-                <div>$125.33</div>
+        <div className='expense-item'>
+            <div>{props.date.toISOString()}</div>
+            <div className='expense-item__description'>
+                <h2>{props.title}</h2>
+                <div className='expense-item__price'>${props.amount}</div>
             </div>
         </div>
     );
