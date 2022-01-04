@@ -10,24 +10,19 @@ import './ExpenseItem.css';
 const ExpenseItem = (props) => {
 // hooks, useExample, must be called inside component functions
 // not inside of nested functions or outside, only 1 exception
-  const [title, setTitle] = useState(props.title);
+
   // array destructuring (split into 2 arr)
   // returns a special function that we can use / array
   // first val is the current state value 
   // second element is the updating function
 
-  const clickHandler = () => {
-    setTitle('Updated');
-  }
-
   return (
     <Card className='expense-item'>
       <ExpenseDate date={props.date} />
       <div className='expense-item__description'>
-        <h2>{title}</h2>
+        <h2>{props.title}</h2>
         <div className='expense-item__price'>${props.amount}</div>
       </div>
-      <button onClick={clickHandler}>Change Title</button>
     </Card>
   );
 }

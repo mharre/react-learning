@@ -41,6 +41,9 @@ const App = () => {
   };
 
   // good practice to have onNameHere to indicate function pointer
+  // when we pass data upwards we are also 'lifting the state up'
+  // we can then pass that new data down via props BECAUSE
+  // we can't pass data in between siblings (only parent/child)
   return (
     <div>
       <NewExpense onAddExpense={addExpenseHandler} />
