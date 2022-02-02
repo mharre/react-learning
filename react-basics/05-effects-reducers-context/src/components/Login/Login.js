@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
@@ -11,20 +11,33 @@ const Login = (props) => {
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
+  useEffect(() => {
+
+    // this is technically being ran with every keystroke, not the best idea to do
+    // example: http request to a backend to check if username exists, don't want to send a bunch of req's
+    // implement: debouncing, keeping track of time after keys are done typing
+    const identifier = setTimeout(() => {
+      // the trick: we save the timer, and for the next keystroke we clear it so we only have 1 ongoing timer at a time
+      // only the last timer will therefore complete
+      console.log('Checking form validity')
+      setFormIsValid(
+        enteredEmail.includes('@') && enteredPassword.trim().length > 6
+      );
+    }, 500);
+
+    return () => {
+      console.log('cleanup function!!')
+      clearTimeout(identifier);
+    };
+
+  },[setFormIsValid, enteredEmail, enteredPassword]);
+
   const emailChangeHandler = (event) => {
     setEnteredEmail(event.target.value);
-
-    setFormIsValid(
-      event.target.value.includes('@') && enteredPassword.trim().length > 6
-    );
   };
 
   const passwordChangeHandler = (event) => {
     setEnteredPassword(event.target.value);
-
-    setFormIsValid(
-      event.target.value.trim().length > 6 && enteredEmail.includes('@')
-    );
   };
 
   const validateEmailHandler = () => {
