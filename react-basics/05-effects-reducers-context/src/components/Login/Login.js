@@ -59,32 +59,40 @@ const Login = (props) => {
     const [passwordState, dispatchPassword] = useReducer(
       passwordReducer,{value: '', isValid: null});
 
-  //useEffect(() => {
-  //  // this is technically being ran with every keystroke, not the best idea to do
-  //  // example: http request to a backend to check if username exists, don't want to send a bunch of req's
-  //  // implement: debouncing, keeping track of time after keys are done typing
-  //  const identifier = setTimeout(() => {
-  //    // the trick: we save the timer, and for the next keystroke we clear it so we only have 1 ongoing timer at a time
-  //    // only the last timer will therefore complete
-  //    //console.log('Checking form validity')
-  //    setFormIsValid(
-  //      enteredEmail.includes('@') && enteredPassword.trim().length > 6
-  //    );
-  //  }, 500);
+    // this is an example of object restructuring
+    // taking value of isValid and alias assigning it to email/passwordIsValid
+    const {isValid: emailIsValid} = emailState;      
+    const {isValid: passwordIsValid} = passwordState
+    // useEffect ran every single time even after password was valid
+    // ex: more than 6 chars, typed another one it would run AGAIN - don't want this behavior
+    // we use hte obj destructuring / alias assigning to manage this bad behavior
 
-  //  return () => {
-  //    //console.log('cleanup function!!')
-  //    clearTimeout(identifier);
-  //  };
+    useEffect(() => {
+      // this is technically being ran with every keystroke, not the best idea to do
+      // example: http request to a backend to check if username exists, don't want to send a bunch of req's
+      // implement: debouncing, keeping track of time after keys are done typing
+      const identifier = setTimeout(() => {
+        // the trick: we save the timer, and for the next keystroke we clear it so we only have 1 ongoing timer at a time
+        // only the last timer will therefore complete
+        //console.log('Checking form validity')
+        setFormIsValid(
+          emailIsValid && passwordIsValid
+        );
+      }, 500);
 
-  //},[setFormIsValid, enteredEmail, enteredPassword]);
+      return () => {
+        //console.log('cleanup function!!')
+        clearTimeout(identifier);
+      };
+
+    },[setFormIsValid, emailIsValid, passwordIsValid]);
 
   const emailChangeHandler = (event) => {
     dispatchEmail({type: 'USER_INPUT', val: event.target.value});
 
-    setFormIsValid(
-      event.target.value.includes('@') && passwordState.isValid
-    );
+    //setFormIsValid(
+    //  event.target.value.includes('@') && passwordState.isValid
+    //);
   };
 
   const passwordChangeHandler = (event) => {
@@ -93,9 +101,9 @@ const Login = (props) => {
       {type: 'USER_INPUT', val: event.target.value}
     );
 
-    setFormIsValid(
-      emailState.isValid && event.target.value.trim().length > 6
-    );
+    //setFormIsValid(
+    //  emailState.isValid && event.target.value.trim().length > 6
+    //);
   };
 
   const validateEmailHandler = () => {
