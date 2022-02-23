@@ -39,7 +39,7 @@ const AvailableMeals = (props) => {
       setError(error.message);
     });
     // we have to catch the error like this instead of wrapping in try {} and catch (error) {} because
-    // fetchMeals() is an async func that returns promise, if throw error inside promise that error will cause that promise to reject
+    // fetchMeals() is an async func that returns promise, if it throws error inside promise that error will cause that promise to reject
     // we can't use try catch to wrap because we'd need to turn the fetchMeals with await and turn the first func in useEffect with async (not allowed with react)
   }, []);
 
