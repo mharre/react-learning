@@ -31,10 +31,18 @@ const QuoteList = (props) => {
   const changeSortingHandler = () => {
     // we want to use query params to sort
     // and update the query parameters in the url itself
-    history.push('/quotes?sort=' + (isSortingAscending ? 'desc' : 'asc') );
+
+    //history.push(`${location.pathname}?sort=${(isSortingAscending ? 'desc' : 'asc')}`);
+
     // key name is up to us, doesnt need to be sort
     // step number 1 is to change the URL
     // step number 2 is to read this query param and change displayed info accordingly
+
+    //**************** ALTERNATIVE SYNTAX FOR PUSH ************ // 
+    history.push({
+      pathname: location.pathname,
+      search: `?sort=${(isSortingAscending ? 'desc' : 'asc')}`
+    })
   };
 
   return (
