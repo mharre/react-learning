@@ -1,29 +1,48 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { useParams, Route, Link, useRouteMatch } from 'react-router-dom';
+import useHttp from '../hooks/use-http';
+import { getSingleQuote } from '../lib/api';
 
 import Comments from '../components/comments/Comments';
 import HighlightedQuote from '../components/quotes/HighlightedQuote';
-
-const DUMMY_QUOTES = [
-    {id: 'q1', author: 'Bob', text: 'This quote sucks'},
-    {id: 'q2', author: 'Robert', text: 'This quote is good'},
-];
+import LoadingSpinner from '../components/UI/LoadingSpinner';
 
 const QuoteDetail = () => {
     const match = useRouteMatch();
     const params = useParams();
-
     //console.log(match);
+    const { quoteId } = params
+    // want to get just quoteId because then useEffect would be triggered each time the params side effect changes
 
-    const quote = DUMMY_QUOTES.find(quote => quote.id === params.quoteId);
+    const {sendRequest, status, data: loadedQuote, error} = useHttp(getSingleQuote, true);
 
-    if (!quote) {
-        return <p>No quote found!</p>;
+    useEffect(() => {
+        sendRequest(quoteId);
+    }, [sendRequest, quoteId]);
+
+
+    if (status === 'pending') {
+        return (
+            <div className='centered'>
+                <LoadingSpinner />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <p className='centered'>{error}</p>
+        );
+    }
+
+    if (!loadedQuote.text) {
+        return <p> No Quote Found </p>
     }
 
     return (
         <React.Fragment>
-            <HighlightedQuote text={quote.text} author={quote.author} />
+            <HighlightedQuote text={loadedQuote.text} author={loadedQuote.author} />
             <Route path={match.path} exact>
                 <div className='centered'>
                     <Link className='btn--flat' to={`${match.url}/comments`}>
