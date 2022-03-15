@@ -49,7 +49,7 @@ export const AuthContextProvider = (props) => {
     // converts truthy or falsey value into a true / false boolean
     // if token is string that is not empty it will return true, if empty it will return false
 
-    const logoutHandler = () => {
+    const logoutHandler = useCallback(() => {
         setToken(null);
         localStorage.removeItem('token');
         localStorage.removeItem('expirationTime');
@@ -57,7 +57,7 @@ export const AuthContextProvider = (props) => {
         if (logoutTimer) {
             clearTimeout(logoutTimer); // clear timer if timer was set
         }
-    };
+    }, []);
 
     const loginHandler = (token, expirationTime) => {
         setToken(token);
