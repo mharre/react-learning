@@ -1,9 +1,11 @@
 import { useState, useRef, useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import AuthContext from '../../store/auth-context';
 import classes from './AuthForm.module.css';
 
 const AuthForm = () => {
+  const history = useHistory();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
 
@@ -57,7 +59,12 @@ const AuthForm = () => {
       }
     }).then(data => { // make it into this block with no errors
       //console.log(data);
-      authCtx.login(data.idToken);
+      const expirationTime = new Date(
+        new Date().getTime() + (+data.expiresIn * 1000)
+      ); 
+      // convert data.expiresIn to number with +, then convert to milliseconds, and add it to the current timestamp in milliseconds and that is then passed to new date again to construct new date object from that time stamp in milliseconds
+      authCtx.login(data.idToken, expirationTime.toISOString());
+      history.replace('/');
     }).catch(err => { // if error, promises above are rjected
       // keeping it simple so just using alert
       alert(err.message);

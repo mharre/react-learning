@@ -9,6 +9,12 @@ const MainNavigation = () => {
 
   const isLoggedIn = authCtx.isLoggedIn;
 
+  const logoutHandler = () => {
+    authCtx.logout();
+    // issue is: if we are on profile page, we logout but profile page still remains
+    // solve this by: redirect or navigation guards (protected pages). this is the best solution
+  };
+
   return (
     <header className={classes.header}>
       <Link to='/'>
@@ -28,7 +34,7 @@ const MainNavigation = () => {
           )}
           {isLoggedIn && (
             <li>
-              <button>Logout</button>
+              <button onClick={logoutHandler}>Logout</button>
             </li>
           )}
         </ul>
