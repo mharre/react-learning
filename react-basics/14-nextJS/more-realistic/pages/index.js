@@ -1,21 +1,5 @@
+import { MongoClient } from 'mongodb';
 import MeetupList from '../components/meetups/MeetupList';
-
-const DUMMY_MEETUPS = [
-    {
-        id: 'm1',
-        title: 'A First Meetup',
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Frauenkirche_and_Neues_Rathaus_Munich_March_2013.JPG/1280px-Frauenkirche_and_Neues_Rathaus_Munich_March_2013.JPG',
-        address: 'Some Address, 5, 12345 City',
-        description: 'The first meetup'
-    },
-    {
-        id: 'm2',
-        title: 'A Second Meetup',
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Frauenkirche_and_Neues_Rathaus_Munich_March_2013.JPG/1280px-Frauenkirche_and_Neues_Rathaus_Munich_March_2013.JPG',
-        address: 'Some Address, 5, 12345 City',
-        description: 'The second meetup'
-    },
-]
 
 const HomePage = (props) => {
     return (
@@ -39,9 +23,26 @@ export async function getStaticProps() {
     // can execute any code here that you would run on a server, access file system securely connect to DB etc, never ends up on client side
     // ALWAYS return an obj, with props property, which holds a prop object which you recieve in your component function
     // they are then set as props for the page component
+
+    const client = await MongoClient.connect('mongodb+srv://matthew:Ballsack290550!!@cluster0.z5bhi.mongodb.net/meetups?retryWrites=true&w=majority');
+    const db = client.db();
+
+    const meetupsCollection = db.collection('meetups');
+    
+    const meetups = await meetupsCollection.find().toArray();
+    // async func which returns a promise and will find all documents in that collection
+
+    client.close();
+    
     return {
         props: {
-            meetups: DUMMY_MEETUPS
+            meetups: meetups.map(meetup => ({
+                title: meetup.title,
+                address: meetup.address,
+                image: meetup.image,
+                id: meetup._id.toString()
+            }))
+            // required to map the meetups because of the unique object ID from mongo, also id is specific to mongo db to get the actual id from the mongodb object
         },
         revalidate: 10
     };

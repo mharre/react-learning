@@ -1,51 +1,61 @@
+import { MongoClient, ObjectId } from 'mongodb';
 import MeetupDetail from "../../components/meetups/MeetupDetail";
 
-const MeetupDetails = () => {
+const MeetupDetails = (props) => {
     return (
         <MeetupDetail
-            image='https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Frauenkirche_and_Neues_Rathaus_Munich_March_2013.JPG/1280px-Frauenkirche_and_Neues_Rathaus_Munich_March_2013.JPG'
-            title='First Meetup'
-            address='Some Street 5, Some City'
-            description='This is a first meetup'
+            image={props.meetupData.image}
+            title={props.meetupData.title}
+            address={props.meetupData.address}
+            description={props.meetupData.description}
         />
     )
 };
 
 export async function getStaticPaths() {
+    const client = await MongoClient.connect('mongodb+srv://matthew:Ballsack290550!!@cluster0.z5bhi.mongodb.net/meetups?retryWrites=true&w=majority');
+    const db = client.db();
+
+    const meetupsCollection = db.collection('meetups');
+
+    const meetups = await meetupsCollection.find({}, {_id: 1}).toArray(); //empty obj = still find all, second arg = which fields for every doc we want. only fetch id's and no other field data
+
+    client.close();
+
     return {
         fallback: false,
-        paths: [
-            {
-                params: {
-                    meetupId: 'm1'
-                }
-            },
-            {
-                params: {
-                    meetupId: 'm2'
-                }
-            },
-        ]
+        paths: meetups.map(meetup => ({
+            params: {meetupId: meetup._id.toString() },
+        }))     
     }
 };
 
 export async function getStaticProps(context) {
-    //fetch data for single meet up
     const meetupId = context.params.meetupId;
-    //meetupId because its what we have between []
-    console.log(meetupId);
-    // only see this console log in our terminal console but not terminal as all code here is for server
+
+    const client = await MongoClient.connect('mongodb+srv://matthew:Ballsack290550!!@cluster0.z5bhi.mongodb.net/meetups?retryWrites=true&w=majority');
+    const db = client.db();
+
+    const meetupsCollection = db.collection('meetups');
+
+    const selectedMeetup = await meetupsCollection.findOne({
+        _id: ObjectId(meetupId)
+    });
+    // needed to convert it from string to the mongodb objectid
+
+    client.close();
 
     return {
         props: {
             meetupData: {
-                image:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Frauenkirche_and_Neues_Rathaus_Munich_March_2013.JPG/1280px-Frauenkirche_and_Neues_Rathaus_Munich_March_2013.JPG',
-                id: meetupId,
-                title: 'First Meetup',
-                address: 'Some street 5, Some City',
-                description: 'This is a first meetup'
-            }
+                id: selectedMeetup._id.toString(),
+                title: selectedMeetup.title,
+                address: selectedMeetup.address,
+                image: selectedMeetup.image,
+                description: selectedMeetup.description,
+            },
         }
+        // need to convert the _id field back to string or serialization error
     }
 };
 
