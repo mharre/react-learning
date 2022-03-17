@@ -17,10 +17,34 @@ const DUMMY_MEETUPS = [
     },
 ]
 
-const HomePage = () => {
+const HomePage = (props) => {
     return (
-        <MeetupList meetups={DUMMY_MEETUPS} />
+        <MeetupList meetups={props.meetups} />
     )
 };
+
+//export async function getServerSideProps(context) {
+//    const req = context.req;
+//    const res = context.res;
+//
+//    //fetch data via API
+//    return {
+//        props: {
+//            meetups: DUMMY_MEETUPS
+//        }
+//    };
+//};
+
+export async function getStaticProps() {
+    // can execute any code here that you would run on a server, access file system securely connect to DB etc, never ends up on client side
+    // ALWAYS return an obj, with props property, which holds a prop object which you recieve in your component function
+    // they are then set as props for the page component
+    return {
+        props: {
+            meetups: DUMMY_MEETUPS
+        },
+        revalidate: 10
+    };
+}
 
 export default HomePage
